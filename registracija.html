@@ -241,6 +241,12 @@
                    // Redirekcija na prijavu
                     window.location.href = 'slanjezahteva.html';
                 })
+                    .fail(function (xhr, status, error) {
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            $('#email-error').text(xhr.responseJSON.error);
+                            $('#email-error').css('color', 'red');
+                        }
+                    });
             }
         });
     });
