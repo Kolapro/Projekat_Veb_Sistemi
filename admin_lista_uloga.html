@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="token"
+          content="BabaSoTWAXQScy4Zv7SjXo936VC2i8IJJ1izn2Q2jlRaJEGb5uVBQPRhEoLotSU05XIz9EnFEDAhSOD8g9dVniDxVc">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+        $(function () {
+            let token = $('meta[name="token"]').attr('content');
+            let userToken = localStorage.getItem('token');
+
+            let settingsRoles = {
+                "url": "https://vsis.mef.edu.rs/projekat/ulaznice/public_html/api/uloga?apitoken=" + token,
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + userToken
+                },
+            };
+
+            $.ajax(settingsRoles).done(function (roles) {
+                let settingsUsers = {
+                    "url": "https://vsis.mef.edu.rs/projekat/ulaznice/public_html/api/korisnik?apitoken=" + token,
+                    "method": "GET",
+                    "timeout": 0,
+                    "headers": {
+                        "Accept": "application/json",
+                        "Authorization": "Bearer " + userToken
+                    },
+                };
+                let admin_count=0;
+                let blag_count=0;
+                let reg_count=0;
+                let blok_count=0;
+                $.ajax(settingsUsers).done(function (users) {
+                    users.forEach(user => {
+                        switch(user.uloga.id) {
+                            case 1:
+                                admin_count++;
+                                break;
+                            case 2:
+                                blag_count++;
+                                break;
+                            case 3:
+                                reg_count++;
+                                break;
+                            case 4:
+                                blok_count++;
+                        }
+                    });
+
+                    let tabela = '<table border="1"><tr><th>Id</th><th>Назив</th><th>Опис</th><th>Број корисника</th></tr>';
+
+                    roles.forEach(role => {
+                        let count;
+                        if(role.id==1){
+                            count=admin_count;
+                        }
+                        else if (role.id==2){
+                            count=blag_count;
+                        }
+                        else if (role.id==3){
+                            count=reg_count;
+                        }
+                        else if (role.id==4){
+                            count=blok_count;
+                        }
+                        tabela += `<tr>
+                                    <td>${role.id}</td>
+                                    <td>${role.naziv}</td>
+                                    <td>${role.opis}</td>
+                                    <td><a href="#" class="user-count" data-role-id="${role.id}">${count}</a></td>
+                                  </tr>`;
+                    });
+
+                    tabela += '</table>';
+                    $('body').append(tabela);
+
+                    $('.user-count').on('click', function (event) {
+                        event.preventDefault();
+                        let idKorisnika = $(this).data('role-id');
+                        let filtriraniKorisnici = users.filter(user => user.uloga.id == idKorisnika);
+
+                        let tabelaKorisnika = '<table border="1"><tr><th>Id</th><th>Ime</th><th>Email</th></tr>';
+                        filtriraniKorisnici.forEach(user => {
+                            tabelaKorisnika += `<tr>
+                                            <td>${user.id}</td>
+                                            <td>${user.imePrezime}</td>
+                                            <td>${user.email}</td>
+                                          </tr>`;
+                        });
+                        tabelaKorisnika += '</table>';
+                        $('body').append(`<div class="user-table">${tabelaKorisnika}</div>`);
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

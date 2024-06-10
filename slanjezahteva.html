@@ -88,7 +88,7 @@
                         localStorage.setItem('token', response.token);
                         localStorage.setItem('type', response.type);
                         if(response.type === "администратор") {
-                            window.location.href = 'admin_pocetna.html';
+                            window.location.href = 'admin_lista_uloga.html';
                         } else if(response.type === "благајник") {
                             window.location.href = 'blagajnik_pocetna.html';
                         } else if(response.type === "регистровани корисник") {
